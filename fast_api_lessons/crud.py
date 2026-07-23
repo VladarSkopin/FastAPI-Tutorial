@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from models import User
-from schemas import UserCreate
+from schemas import UserCreate, UserUpdate
 
 
-def get_all_users(db: Session):
+def get_all_users(db: Session) -> list[User]:
     return db.query(User).all()
 
 
-def get_user_by_id(db: Session, user_id: int):
+def get_user_by_id(db: Session, user_id: int) -> User | None:
     return (
         db.query(User)
         .filter(User.id == user_id)
@@ -15,7 +15,7 @@ def get_user_by_id(db: Session, user_id: int):
     )
 
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> User | None:
     return (
         db.query(User)
         .filter(User.email == email)
@@ -23,7 +23,7 @@ def get_user_by_email(db: Session, email: str):
     )
 
 
-def create_user(db: Session, user: UserCreate):
+def create_user(db: Session, user: UserCreate) -> User:
 
     db_user = User(**user.model_dump())
 
@@ -37,14 +37,14 @@ def create_user(db: Session, user: UserCreate):
 def update_user(
     db: Session,
     user_id: int,
-    user_data: UserCreate
-):
+    user_data: UserUpdate
+) -> User | None:
     db_user = db.query(User).filter(User.id == user_id).first()
 
     if not db_user:
         return None
 
-    for field, value in user_data.model_dump().items():
+    for field, value in user_data.model_dump(exclude_unset=True).items():
         setattr(db_user, field, value)
 
     db.commit()
@@ -56,7 +56,7 @@ def update_user(
 def delete_user(
     db: Session,
     user_id: int
-):
+) -> User | None:
     db_user = db.query(User).filter(User.id == user_id).first()
 
     if not db_user:

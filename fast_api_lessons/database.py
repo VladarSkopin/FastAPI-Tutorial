@@ -1,32 +1,21 @@
+from collections.abc import Generator
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-import os
+from sqlalchemy.orm import Session, sessionmaker
 
-load_dotenv()
-
-DATABASE_URL = (
-    f"postgresql+psycopg://"
-    f"{os.getenv('DB_USER')}:"
-    f"{os.getenv('DB_PASSWORD')}@"
-    f"{os.getenv('DB_HOST')}:"
-    f"{os.getenv('DB_PORT')}/"
-    f"{os.getenv('DB_NAME')}"
-)
+from config import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(
-    autocommit=False,
+    bind=engine,
     autoflush=False,
-    bind=engine
+    autocommit=False,
+    expire_on_commit=False  # prevents SQLAlchemy from expiring ORM objects after commit()
 )
 
-
-def get_db():
+def get_db() -> Generator[Session, None, None]:  # [yields Session, receives nothing via "send()", returns nothing]
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-

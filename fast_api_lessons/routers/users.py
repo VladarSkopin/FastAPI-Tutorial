@@ -4,7 +4,7 @@ from typing import List
 
 import crud
 from database import get_db
-from schemas import UserCreate, UserResponse
+from schemas import UserCreate, UserResponse, UserUpdate
 
 
 router = APIRouter(
@@ -16,7 +16,7 @@ router = APIRouter(
 @router.get("", response_model=List[UserResponse])
 def get_all_users(
     db: Session = Depends(get_db)
-):
+) -> list[UserResponse]:
     return crud.get_all_users(db)
 
 
@@ -24,7 +24,7 @@ def get_all_users(
 def get_user(
     user_id: int,
     db: Session = Depends(get_db)
-):
+) -> UserResponse:
     user = crud.get_user_by_id(db, user_id)
 
     if not user:
@@ -40,7 +40,7 @@ def get_user(
 def create_user(
     user: UserCreate,
     db: Session = Depends(get_db)
-):
+) -> UserResponse:
 
     if crud.get_user_by_email(db, user.email):
         raise HTTPException(
@@ -54,9 +54,9 @@ def create_user(
 @router.put("/{user_id}", response_model=UserResponse)
 def update_user(
     user_id: int,
-    user: UserCreate,
+    user: UserUpdate,
     db: Session = Depends(get_db)
-):
+) -> UserResponse:
 
     updated_user = crud.update_user(
         db,
@@ -80,14 +80,14 @@ def update_user(
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db)
-):
+) -> Response:
 
     deleted_user = crud.delete_user(db, user_id)
 
     if deleted_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail=f"User with id {user_id} not found"
         )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
