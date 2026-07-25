@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 
+from authorization import require_roles
+from constants import UserRole
 import db.crud_user as crud_user
 from db.database import get_db
-from dependencies import get_current_active_user
 from db.models import User
 from schemas import UserResponse, UserUpdate
 
@@ -16,8 +17,8 @@ router = APIRouter(
 
 @router.get("", response_model=list[UserResponse])
 def get_all_users(
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles(UserRole.SYSADMIN))
 ) -> list[UserResponse]:
     """Get all users"""
     return crud_user.get_all_users(db)
@@ -26,8 +27,8 @@ def get_all_users(
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
     user_id: int,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles(UserRole.SYSADMIN))
 ) -> UserResponse:
     """Get single user by ID"""
     user = crud_user.get_user_by_id(db, user_id)
@@ -45,8 +46,8 @@ def get_user(
 def update_user(
     user_id: int,
     user: UserUpdate,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles(UserRole.SYSADMIN))
 ) -> UserResponse:
     """Update a user"""
 
@@ -68,8 +69,8 @@ def update_user(
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: int,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles(UserRole.SYSADMIN))
 ) -> Response:
     """Delete a user"""
 

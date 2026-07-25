@@ -4,7 +4,7 @@ from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Enum as SqlEnum
 
-from constants import LoanStatus
+from constants import LoanStatus, UserRole
 
 
 Base = declarative_base()
@@ -17,7 +17,14 @@ class User(Base):
     name = Column(String(100), nullable=False)
     age = Column(Integer, nullable=False)
     email = Column(String(50), nullable=False, unique=True)
-    role = Column(String(100), nullable=True)
+    role = Column(
+        SqlEnum(
+            UserRole,
+            name="userrole",
+            create_type=False,
+        ),
+        nullable=False,
+    )
     
     loans = relationship("Loan", back_populates="user")
 

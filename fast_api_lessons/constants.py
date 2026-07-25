@@ -5,3 +5,7 @@ class LoanStatus(str, Enum):
     WITHOUT_OVERDUE = "WITHOUT_OVERDUE"
     CLOSED = "CLOSED"
 
+class UserRole(str, Enum):
+    SYSADMIN = "SYSADMIN"
+    MLENGINEER = "MLENGINEER"
+    SCIENTIST = "SCIENTIST"
