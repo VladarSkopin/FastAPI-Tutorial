@@ -11,3 +11,9 @@ DATABASE_URL = (
     f"{os.getenv('DB_PORT')}/"
     f"{os.getenv('DB_NAME')}"
 )
+
+SECRET_KEY: str = os.getenv("SECRET_KEY", "")
+ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
+TOKEN_EXPIRE_MINUTES: int = int(
+    os.getenv("TOKEN_EXPIRE_MINUTES", "30")
+)

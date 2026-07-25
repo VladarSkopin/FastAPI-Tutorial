@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models import User
-from schemas import UserCreate, UserUpdate
+from db.models import User
+from schemas import UserUpdate
 
 
 def get_all_users(db: Session) -> list[User]:
@@ -21,17 +21,6 @@ def get_user_by_email(db: Session, email: str) -> User | None:
         .filter(User.email == email)
         .first()
     )
-
-
-def create_user(db: Session, user: UserCreate) -> User:
-
-    db_user = User(**user.model_dump())
-
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-
-    return db_user
 
 
 def update_user(
