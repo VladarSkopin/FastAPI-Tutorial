@@ -14,11 +14,6 @@ formatter = logging.Formatter(LOG_FORMAT)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format="%(levelname)-8s %(asctime)s [ %(name)s ] %(message)s"
-# )
-
 file_handler = RotatingFileHandler(
     "logs/app.log",
     maxBytes=5 * 1024 * 1024,
